@@ -1,17 +1,29 @@
 import classNames from "classnames";
+import { FaSync } from "react-icons/fa";
 
-function Button({ children, updateBtn, ...rest }) {
+function Button({
+    children,
+    primaryBtn,
+    secondaryBtn,
+    updateBtn,
+    isLoading,
+    ...rest
+}) {
     const classes = classNames(
-        "flex items-center gap-2 py-2 px-3 rounded text-gray-900 font-medium",
+        `flex items-center gap-2 ${
+            isLoading ? " py-3 " : " py-2 "
+        } px-3 rounded text-gray-950 font-medium`,
         {
             "bg-green-400": updateBtn,
+            "bg-sky-400": primaryBtn,
+            "bg-slate-300": secondaryBtn,
         },
         rest.className
     );
 
     return (
-        <button {...rest} className={classes}>
-            {children}
+        <button {...rest} disabled={isLoading} className={classes}>
+            {isLoading ? <FaSync className="animate-spin" /> : children}
         </button>
     );
 }
