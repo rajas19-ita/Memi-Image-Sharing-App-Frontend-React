@@ -1,44 +1,47 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "../components/Button";
-import GalleryImage from "../components/GalleryImage";
-import { FaPlus } from "react-icons/fa";
+import Gallery from "../components/Gallery";
+import { FaUpload } from "react-icons/fa";
 import ImageUploadModal from "../components/ImageUploadModal";
 import Navbar from "../components/Navbar";
+import useFetchImages from "../hooks/useFetchImages";
 
 function UserGallery() {
     const [showUploadModal, setShowUploadModal] = useState(false);
-    const [imageList, setImageList] = useState([]);
-
-    const handleAddImg = (img) => {
-        setImageList((imageList) => [img, ...imageList]);
-    };
+    const { isLoading, imagesData, error, page, setPage, triggerRefetch } =
+        useFetchImages();
 
     return (
         <>
             <Navbar />
             <div className="flex flex-col px-6">
-                <div className="self-center py-4">
+                <div className="self-center py-5">
                     <Button
                         onClick={() => {
                             setShowUploadModal(true);
                         }}
+                        className="gap-2.5 px-4"
                         updateBtn
                     >
-                        <FaPlus />
-                        Add Image
+                        <FaUpload size={18} />
+                        Upload Image
                     </Button>
                     {showUploadModal && (
                         <ImageUploadModal
                             onClose={() => setShowUploadModal(false)}
-                            onAdd={handleAddImg}
+                            onUpload={() => {
+                                triggerRefetch();
+                            }}
                         />
                     )}
                 </div>
-                <div className="flex py-3 gap-6 flex-wrap">
-                    {imageList.map((img, i) => (
-                        <GalleryImage key={i} img={img} />
-                    ))}
-                </div>
+                <Gallery
+                    isLoading={isLoading}
+                    imagesData={imagesData}
+                    error={error}
+                    page={page}
+                    setPage={setPage}
+                />
             </div>
         </>
     );

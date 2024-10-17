@@ -7,6 +7,7 @@ function Button({
     secondaryBtn,
     updateBtn,
     isLoading,
+    isDisabled,
     ...rest
 }) {
     const classes = classNames(
@@ -22,7 +23,11 @@ function Button({
     );
 
     return (
-        <button {...rest} disabled={isLoading} className={classes}>
+        <button
+            {...rest}
+            disabled={isLoading || isDisabled}
+            className={classes}
+        >
             {isLoading ? <FaSync className="animate-spin" /> : children}
         </button>
     );

@@ -1,17 +1,56 @@
 import ReactDom from "react-dom";
-import { FaImage, FaPlus, FaRegWindowClose } from "react-icons/fa";
+import { FaImage, FaUpload, FaRegWindowClose } from "react-icons/fa";
 import Button from "./Button";
 import { useState } from "react";
+import useAuth from "../hooks/useAuth";
 
-function ImageUploadModal({ onClose, onAdd }) {
+function ImageUploadModal({ onClose, onUpload }) {
     const [previewImg, setPreviewImg] = useState(null);
+    const [imgFile, setImgFile] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const { user } = useAuth();
 
     const handleFileChange = (e) => {
         const reader = new FileReader();
+        setImgFile(e.target.files[0]);
         reader.readAsDataURL(e.target.files[0]);
         reader.addEventListener("load", () => {
             setPreviewImg(reader.result);
         });
+    };
+
+    const handleUpload = async (e) => {
+        setIsLoading(true);
+        setError(null);
+
+        const formData = new FormData();
+        formData.append("image", imgFile);
+
+        try {
+            const response = await fetch(
+                "http://localhost:4000/images/upload",
+                {
+                    method: "post",
+                    body: formData,
+                    headers: {
+                        Authorization: `Bearer ${user.token}`,
+                    },
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw data;
+            }
+            setIsLoading(false);
+            onUpload();
+            onClose();
+        } catch (error) {
+            setError(error.message ? error : { message: "An error occurred" });
+            setIsLoading(false);
+        }
     };
 
     return ReactDom.createPortal(
@@ -50,16 +89,16 @@ function ImageUploadModal({ onClose, onAdd }) {
                     )}
                 </div>
                 <Button
-                    onClick={() => {
-                        onAdd(previewImg);
-                        onClose();
-                    }}
-                    className="justify-center"
+                    onClick={handleUpload}
+                    className="justify-center gap-2.5"
+                    isLoading={isLoading}
+                    isDisabled={!imgFile}
                     updateBtn
                 >
-                    <FaPlus />
-                    Add
+                    <FaUpload size={18} />
+                    Upload
                 </Button>
+                {error && <p className="text-red-500">{error.message}</p>}
             </div>
         </>,
         document.getElementById("portal")
