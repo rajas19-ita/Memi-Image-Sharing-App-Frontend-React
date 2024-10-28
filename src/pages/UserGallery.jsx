@@ -1,15 +1,22 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Button from "../components/Button";
 import Gallery from "../components/Gallery";
-import { FaUpload } from "react-icons/fa";
-import ImageUploadModal from "../components/ImageUploadModal";
+import { FaPlus } from "react-icons/fa";
+import AddImageModal from "../components/AddImageModal";
 import Navbar from "../components/Navbar";
-import useFetchImages from "../hooks/useFetchImages";
+import { useSelector } from "react-redux";
+import { useFetchImagesQuery } from "../store";
 
 function UserGallery() {
-    const [showUploadModal, setShowUploadModal] = useState(false);
-    const { isLoading, imagesData, error, page, setPage, triggerRefetch } =
-        useFetchImages();
+    const user = useSelector((state) => state.user.data);
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(8);
+    const { data, isFetching, error } = useFetchImagesQuery({
+        user,
+        page,
+        pageSize,
+    });
 
     return (
         <>
@@ -18,28 +25,24 @@ function UserGallery() {
                 <div className="self-center py-5">
                     <Button
                         onClick={() => {
-                            setShowUploadModal(true);
+                            setShowAddModal(true);
                         }}
-                        className="gap-2.5 px-4"
+                        className=""
                         updateBtn
                     >
-                        <FaUpload size={18} />
-                        Upload Image
+                        <FaPlus />
+                        Add Image
                     </Button>
-                    {showUploadModal && (
-                        <ImageUploadModal
-                            onClose={() => setShowUploadModal(false)}
-                            onUpload={() => {
-                                triggerRefetch();
-                            }}
-                        />
+                    {showAddModal && (
+                        <AddImageModal onClose={() => setShowAddModal(false)} />
                     )}
                 </div>
                 <Gallery
-                    isLoading={isLoading}
-                    imagesData={imagesData}
+                    isLoading={isFetching}
+                    imagesData={data}
                     error={error}
                     page={page}
+                    pageSize={pageSize}
                     setPage={setPage}
                 />
             </div>

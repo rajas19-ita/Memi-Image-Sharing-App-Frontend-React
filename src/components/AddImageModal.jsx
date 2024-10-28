@@ -1,15 +1,15 @@
 import ReactDom from "react-dom";
-import { FaImage, FaUpload, FaRegWindowClose } from "react-icons/fa";
+import { FaImage, FaPlus, FaRegWindowClose } from "react-icons/fa";
 import Button from "./Button";
 import { useState } from "react";
-import useAuth from "../hooks/useAuth";
+import { useSelector } from "react-redux";
+import { useAddImageMutation } from "../store";
 
-function ImageUploadModal({ onClose, onUpload }) {
+function AddImageModal({ onClose }) {
     const [previewImg, setPreviewImg] = useState(null);
     const [imgFile, setImgFile] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const { user } = useAuth();
+    const user = useSelector((state) => state.user.data);
+    const [addImage, { error, isLoading }] = useAddImageMutation();
 
     const handleFileChange = (e) => {
         const reader = new FileReader();
@@ -20,37 +20,14 @@ function ImageUploadModal({ onClose, onUpload }) {
         });
     };
 
-    const handleUpload = async (e) => {
-        setIsLoading(true);
-        setError(null);
-
+    const handleAddImage = async (e) => {
         const formData = new FormData();
         formData.append("image", imgFile);
 
         try {
-            const response = await fetch(
-                "http://localhost:4000/images/upload",
-                {
-                    method: "post",
-                    body: formData,
-                    headers: {
-                        Authorization: `Bearer ${user.token}`,
-                    },
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw data;
-            }
-            setIsLoading(false);
-            onUpload();
+            await addImage({ user, formData }).unwrap();
             onClose();
-        } catch (error) {
-            setError(error.message ? error : { message: "An error occurred" });
-            setIsLoading(false);
-        }
+        } catch (error) {}
     };
 
     return ReactDom.createPortal(
@@ -73,36 +50,35 @@ function ImageUploadModal({ onClose, onUpload }) {
                         <div className="flex flex-col items-center absolute">
                             <FaImage size={30} />
                             <input
-                                id="uploadImg"
+                                id="addImg"
                                 type="file"
                                 accept=".jpg,.jpeg,.png"
                                 className="hidden"
                                 onChange={handleFileChange}
                             />
-                            <label
-                                htmlFor="uploadImg"
-                                className=" cursor-pointer"
-                            >
+                            <label htmlFor="addImg" className=" cursor-pointer">
                                 Select Image
                             </label>
                         </div>
                     )}
                 </div>
                 <Button
-                    onClick={handleUpload}
-                    className="justify-center gap-2.5"
+                    onClick={handleAddImage}
+                    className="justify-center"
                     isLoading={isLoading}
                     isDisabled={!imgFile}
                     updateBtn
                 >
-                    <FaUpload size={18} />
-                    Upload
+                    <FaPlus />
+                    Add
                 </Button>
-                {error && <p className="text-red-500">{error.message}</p>}
+                {error && error.data && (
+                    <p className="text-red-500">{error.data.message}</p>
+                )}
             </div>
         </>,
         document.getElementById("portal")
     );
 }
 
-export default ImageUploadModal;
+export default AddImageModal;

@@ -1,14 +1,14 @@
 import Button from "./Button";
 import { PiSignOutBold } from "react-icons/pi";
-import useAuth from "../hooks/useAuth";
+
+import { useDispatch } from "react-redux";
+import { logout } from "../store";
 
 function Navbar() {
-    const { dispatch } = useAuth();
+    const dispatch = useDispatch();
 
     const handleLogout = () => {
-        dispatch({
-            type: "LOGOUT",
-        });
+        dispatch(logout());
     };
 
     return (

@@ -11,8 +11,10 @@ function Button({
     ...rest
 }) {
     const classes = classNames(
-        `flex items-center gap-2 ${
+        `flex items-center gap-2 cursor-pointer ${
             isLoading ? " py-3 " : " py-2 "
+        } ${
+            isDisabled && " bg-opacity-60 text-opacity-60 "
         } px-3 rounded text-gray-950 font-medium`,
         {
             "bg-green-400": updateBtn,

@@ -2,7 +2,7 @@ import GalleryImage from "./GalleryImage";
 import { FaSync, FaAngleLeft, FaAngleRight } from "react-icons/fa";
 import Button from "./Button";
 
-function Gallery({ imagesData, isLoading, error, page, setPage }) {
+function Gallery({ imagesData, isLoading, error, page, pageSize, setPage }) {
     return (
         <div className="flex flex-col gap-3">
             {isLoading ? (
@@ -10,7 +10,15 @@ function Gallery({ imagesData, isLoading, error, page, setPage }) {
                     <FaSync className=" animate-spin" size={25} />
                 </div>
             ) : error ? (
-                <p className="self-center py-3 text-red-500">{error.message}</p>
+                error.data && (
+                    <p className="self-center py-3 text-red-500">
+                        {error.data.message}
+                    </p>
+                )
+            ) : imagesData && imagesData.totalImages === 0 ? (
+                <p className="self-center py-3 text-gray-500">
+                    No Images Added
+                </p>
             ) : (
                 <div className="py-3 grid grid-cols-4 gap-6">
                     {imagesData &&
@@ -21,7 +29,7 @@ function Gallery({ imagesData, isLoading, error, page, setPage }) {
             )}
             <div className="flex justify-center gap-2 border-t py-3">
                 <Button
-                    onClick={() => setPage((page) => page - 1)}
+                    onClick={() => setPage((prev) => prev - 1)}
                     isDisabled={page === 1}
                     secondaryBtn
                 >
@@ -29,8 +37,14 @@ function Gallery({ imagesData, isLoading, error, page, setPage }) {
                 </Button>
                 Page {page} {imagesData && `of ${imagesData.totalPages}`}
                 <Button
-                    onClick={() => setPage((page) => page + 1)}
-                    isDisabled={!imagesData || page === imagesData.totalPages}
+                    onClick={() => {
+                        setPage((prev) => prev + 1);
+                    }}
+                    isDisabled={
+                        !imagesData ||
+                        imagesData.totalImages === 0 ||
+                        page === imagesData.totalPages
+                    }
                     secondaryBtn
                 >
                     <FaAngleRight />

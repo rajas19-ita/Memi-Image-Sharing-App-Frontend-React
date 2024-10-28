@@ -1,28 +1,29 @@
 import Button from "./Button";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import useLogin from "../hooks/useLogin";
-import useAuth from "../hooks/useAuth";
+import { userLogin } from "../store";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
 
 function LoginForm() {
-    const { dispatch } = useAuth();
+    const { isLoading, data, error } = useSelector((state) => state.user);
+    const dispatch = useDispatch();
     const {
         register,
         handleSubmit,
         reset,
         formState: { errors },
     } = useForm();
-    const [isLoading, login, error] = useLogin();
-    const onSubmit = async (data) => {
-        const response = await login(data);
-        if (!response || !response.user) {
+
+    useEffect(() => {
+        if (error) {
             reset();
-        } else {
-            dispatch({
-                type: "LOGIN",
-                payload: { ...response.user, token: response.token },
-            });
         }
+    }, [error]);
+
+    const onSubmit = async (data) => {
+        dispatch(userLogin(data));
     };
 
     return (
