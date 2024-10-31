@@ -8,20 +8,20 @@ function Button({
     updateBtn,
     isLoading,
     isDisabled,
+    className,
     ...rest
 }) {
     const classes = classNames(
-        `flex items-center gap-2 cursor-pointer ${
-            isLoading ? " py-3 " : " py-2 "
-        } ${
-            isDisabled && " bg-opacity-60 text-opacity-60 "
-        } px-3 rounded text-gray-950 font-medium`,
+        `flex items-center gap-2 cursor-pointer px-3 rounded text-gray-950 font-medium`,
         {
+            "py-3": isLoading,
+            "py-2": !isLoading,
+            "bg-opacity-60 text-opacity-60": isDisabled,
             "bg-green-400": updateBtn,
             "bg-sky-400": primaryBtn,
             "bg-slate-300": secondaryBtn,
         },
-        rest.className
+        className
     );
 
     return (

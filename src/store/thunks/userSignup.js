@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const userSignup = createAsyncThunk("user/signup", async (user) => {
     try {
@@ -14,6 +15,11 @@ const userSignup = createAsyncThunk("user/signup", async (user) => {
         };
 
         localStorage.setItem("user", JSON.stringify(user));
+
+        toast.success("Account created successfully!", {
+            position: "top-center",
+            autoClose: 2000,
+        });
 
         return user;
     } catch (error) {

@@ -3,6 +3,8 @@ import AppLayout from "./layout/AppLayout";
 import UserGallery from "./pages/UserGallery";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { appInit } from "./store";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
@@ -63,6 +65,7 @@ function App() {
                     />
                 </Route>
             </Routes>
+            <ToastContainer />
         </>
     );
 }
